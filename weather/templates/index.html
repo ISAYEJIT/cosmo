@@ -1,0 +1,68 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{{ title }} - Zarya{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h1 class="display-3 text-primary mb-4">
+                <i class="fas fa-satellite"></i> Zarya
+            </h1>
+            <p class="lead text-muted mb-5">Мониторинг космической погоды в реальном времени</p>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-10 mb-4">
+            <div class="card h-100 main-feature-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-broadcast-tower"></i> NOAA Space Weather Prediction Center</h3>
+                </div>
+                <div class="card-body text-center">
+                    <p class="lead">Детальные метрики космической погоды от NOAA: текущие условия, прогнозы, предупреждения и параметры солнечного ветра.</p>
+                    <a href="{% url 'noaa_detailed' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-satellite"></i> Перейти к мониторингу
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4 mb-4s">
+        <div class="col-12">
+            <div class="card info-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-info-circle"></i> О космической погоде</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="info-block">
+                                <h5>Радиоблэкауты (R)</h5>
+                                <p>Нарушения высокочастотной радиосвязи из-за солнечных вспышек</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-block">
+                                <h5>Солнечные бури (S)</h5>
+                                <p>Потоки энергичных частиц от Солнца, влияющие на спутники</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-block">
+                                <h5>Геомагнитные бури (G)</h5>
+                                <p>Возмущения магнитного поля Земли, влияющие на технологии</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}

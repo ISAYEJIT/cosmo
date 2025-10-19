@@ -1,0 +1,429 @@
+{% extends 'base/base.html' %}
+{% load custom_filters %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+<link href="{% static 'css/noaa-conditions.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-4 text-center text-primary">
+                <i class="fas fa-satellite"></i> NOAA Space Weather Prediction Center
+            </h1>
+            <p class="text-center text-muted">Детальные метрики космической погоды</p>
+            <p class="text-center"><small>Последнее обновление: {{ last_updated }}</small></p>
+        </div>
+    </div>
+
+    {% if noaa_data.error %}
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-danger">
+                    <h4>Ошибка загрузки данных</h4>
+                    <p>{{ noaa_data.error }}</p>
+                </div>
+            </div>
+        </div>
+    {% else %}
+
+        <!-- Current Space Weather Conditions -->
+        {% if noaa_data.current_conditions %}
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-broadcast-tower"></i> Условия космической погоды по шкалам NOAA</h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- Current Observed -->
+                        {% if noaa_data.current_conditions.current %}
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h4>Текущие наблюдения ({{ noaa_data.current_conditions.current.DateStamp }} {{ noaa_data.current_conditions.current.TimeStamp }} UTC)</h4>
+                                <div class="row text-center">
+                                    <div class="col-md-4">
+                                        <div class="condition-box {% if noaa_data.current_conditions.current.R.Scale == "0" or not noaa_data.current_conditions.current.R.Scale %}level-0{% elif noaa_data.current_conditions.current.R.Scale == "1" %}level-1{% else %}level-2-plus{% endif %}">
+                                            <div class="condition-label">R</div>
+                                            <div class="condition-value">
+                                                {% if noaa_data.current_conditions.current.R.Scale and noaa_data.current_conditions.current.R.Scale != "0" %}
+                                                    R{{ noaa_data.current_conditions.current.R.Scale }}
+                                                {% else %}
+                                                    R0
+                                                {% endif %}
+                                            </div>
+                                            <small>Радиоблэкауты</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="condition-box {% if noaa_data.current_conditions.current.S.Scale == "0" or not noaa_data.current_conditions.current.S.Scale %}level-0{% elif noaa_data.current_conditions.current.S.Scale == "1" %}level-1{% else %}level-2-plus{% endif %}">
+                                            <div class="condition-label">S</div>
+                                            <div class="condition-value">
+                                                {% if noaa_data.current_conditions.current.S.Scale and noaa_data.current_conditions.current.S.Scale != "0" %}
+                                                    S{{ noaa_data.current_conditions.current.S.Scale }}
+                                                {% else %}
+                                                    S0
+                                                {% endif %}
+                                            </div>
+                                            <small>Солнечные бури</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="condition-box {% if noaa_data.current_conditions.current.G.Scale == "0" or not noaa_data.current_conditions.current.G.Scale %}level-0{% elif noaa_data.current_conditions.current.G.Scale == "1" %}level-1{% else %}level-2-plus{% endif %}">
+                                            <div class="condition-label">G</div>
+                                            <div class="condition-value">
+                                                {% if noaa_data.current_conditions.current.G.Scale and noaa_data.current_conditions.current.G.Scale != "0" %}
+                                                    G{{ noaa_data.current_conditions.current.G.Scale }}
+                                                {% else %}
+                                                    G0
+                                                {% endif %}
+                                            </div>
+                                            <small>Геомагнитные бури</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Прогнозы с процентами -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h4>Прогнозы вероятностей (из API NOAA)</h4>
+                                {% load custom_filters %}
+                                <div class="row text-center">
+                                    {% if noaa_data.current_conditions.today_forecast %}
+                                    <div class="col-md-4">
+                                        <div class="condition-box {{ noaa_data.current_conditions.today_forecast|forecast_color }}">
+                                            <div class="condition-label">{{ noaa_data.current_conditions.today_forecast.DateStamp }}</div>
+                                            <div class="condition-value">
+                                                <small><strong>R1-R2:</strong> {{ noaa_data.current_conditions.today_forecast.R.MinorProb|default:"0" }}%</small><br>
+                                                <small><strong>R3-R5:</strong> {{ noaa_data.current_conditions.today_forecast.R.MajorProb|default:"0" }}%</small><br>
+                                                <small><strong>S1+:</strong> {{ noaa_data.current_conditions.today_forecast.S.Prob|default:"0" }}%</small><br>
+                                                <small><strong>G:</strong> 
+                                                {% if noaa_data.current_conditions.today_forecast.G.Scale and noaa_data.current_conditions.today_forecast.G.Scale != "0" %}
+                                                    G{{ noaa_data.current_conditions.today_forecast.G.Scale }}
+                                                {% else %}
+                                                    нет
+                                                {% endif %}
+                                                </small>
+                                            </div>
+                                            <small>Сегодня</small>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+
+                                    {% if noaa_data.current_conditions.tomorrow_forecast %}
+                                    <div class="col-md-4">
+                                        <div class="condition-box {{ noaa_data.current_conditions.tomorrow_forecast|forecast_color }}">
+                                            <div class="condition-label">{{ noaa_data.current_conditions.tomorrow_forecast.DateStamp }}</div>
+                                            <div class="condition-value">
+                                                <small><strong>R1-R2:</strong> {{ noaa_data.current_conditions.tomorrow_forecast.R.MinorProb|default:"0" }}%</small><br>
+                                                <small><strong>R3-R5:</strong> {{ noaa_data.current_conditions.tomorrow_forecast.R.MajorProb|default:"0" }}%</small><br>
+                                                <small><strong>S1+:</strong> {{ noaa_data.current_conditions.tomorrow_forecast.S.Prob|default:"0" }}%</small><br>
+                                                <small><strong>G:</strong> 
+                                                {% if noaa_data.current_conditions.tomorrow_forecast.G.Scale and noaa_data.current_conditions.tomorrow_forecast.G.Scale != "0" %}
+                                                    G{{ noaa_data.current_conditions.tomorrow_forecast.G.Scale }}
+                                                {% else %}
+                                                    нет
+                                                {% endif %}
+                                                </small>
+                                            </div>
+                                            <small>Завтра</small>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+
+                                    {% if noaa_data.current_conditions.day_after_forecast %}
+                                    <div class="col-md-4">
+                                        <div class="condition-box {{ noaa_data.current_conditions.day_after_forecast|forecast_color }}">
+                                            <div class="condition-label">{{ noaa_data.current_conditions.day_after_forecast.DateStamp }}</div>
+                                            <div class="condition-value">
+                                                <small><strong>R1-R2:</strong> {{ noaa_data.current_conditions.day_after_forecast.R.MinorProb|default:"0" }}%</small><br>
+                                                <small><strong>R3-R5:</strong> {{ noaa_data.current_conditions.day_after_forecast.R.MajorProb|default:"0" }}%</small><br>
+                                                <small><strong>S1+:</strong> {{ noaa_data.current_conditions.day_after_forecast.S.Prob|default:"0" }}%</small><br>
+                                                <small><strong>G:</strong> 
+                                                {% if noaa_data.current_conditions.day_after_forecast.G.Scale and noaa_data.current_conditions.day_after_forecast.G.Scale != "0" %}
+                                                    G{{ noaa_data.current_conditions.day_after_forecast.G.Scale }}
+                                                {% else %}
+                                                    нет
+                                                {% endif %}
+                                                </small>
+                                            </div>
+                                            <small>Послезавтра</small>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+
+
+        <!-- Solar Wind Data -->
+        {% if noaa_data.solar_wind %}
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-wind"></i> Параметры солнечного ветра (NOAA)</h3>
+                    </div>
+                    <div class="card-body">
+                        <h4>Текущие измерения солнечного ветра</h4>
+                        
+                        {% if noaa_data.solar_wind and noaa_data.solar_wind|length > 1 %}
+                            <!-- Latest reading - visual cards -->
+                            {% with latest=noaa_data.solar_wind|last %}
+                            <div class="row mb-4">
+                                <div class="col-md-3">
+                                    <div class="solar-wind-card time-card">
+                                        <div class="solar-wind-icon">
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+                                        <div class="solar-wind-label">Время UTC</div>
+                                        <div class="solar-wind-value">
+                                            {{ latest.0|slice:":11" }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="solar-wind-card density-card">
+                                        <div class="solar-wind-icon">
+                                            <i class="fas fa-compress-arrows-alt"></i>
+                                        </div>
+                                        <div class="solar-wind-label">Плотность</div>
+                                        <div class="solar-wind-value">
+                                            {{ latest.1 }} см⁻³
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="solar-wind-card speed-card">
+                                        <div class="solar-wind-icon">
+                                            <i class="fas fa-wind"></i>
+                                        </div>
+                                        <div class="solar-wind-label">Скорость</div>
+                                        <div class="solar-wind-value">
+                                            {{ latest.2 }} км/с
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="solar-wind-card temperature-card">
+                                        <div class="solar-wind-icon">
+                                            <i class="fas fa-thermometer-half"></i>
+                                        </div>
+                                        <div class="solar-wind-label">Температура</div>
+                                        <div class="solar-wind-value">
+                                            {{ latest.3|floatformat:0 }} K
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endwith %}
+                        {% else %}
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle"></i> Данные солнечного ветра недоступны
+                            </div>
+                        {% endif %}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Active Alerts from Database -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>
+                            <i class="fas fa-exclamation-triangle"></i> Предупреждения о космической погоде
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="alertsTable" class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th onclick="sortTable(0)" style="cursor: pointer;">
+                                            Код <i class="fas fa-sort"></i>
+                                        </th>
+                                        <th onclick="sortTable(1)" style="cursor: pointer;">
+                                            Шкала NOAA <i class="fas fa-sort"></i>
+                                        </th>
+                                        <th onclick="sortTable(2)" style="cursor: pointer;">
+                                            Потенциальные воздействия <i class="fas fa-sort"></i>
+                                        </th>
+                                        <th onclick="sortTable(3)" style="cursor: pointer;">
+                                            Время выпуска <i class="fas fa-sort"></i>
+                                        </th>
+                                        <th style="width: 120px;">
+                                            Действия
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for alert in noaa_data.db_alerts %}
+                                    <tr class="{% if alert.is_active %}table-warning{% else %}table-light{% endif %}">
+                                        <td>
+                                            <span class="badge bg-primary">{{ alert.message_code }}-{{ alert.serial_number }}</span>
+                                        </td>
+                                        <td>
+                                            {% if alert.noaa_scale %}
+                                                {% if alert.severity_level >= 4 %}
+                                                    <span class="badge bg-danger">{{ alert.noaa_scale }}</span>
+                                                {% elif alert.severity_level >= 3 %}
+                                                    <span class="badge bg-warning">{{ alert.noaa_scale }}</span>
+                                                {% elif alert.severity_level >= 2 %}
+                                                    <span class="badge bg-info">{{ alert.noaa_scale }}</span>
+                                                {% elif alert.severity_level >= 1 %}
+                                                    <span class="badge bg-success">{{ alert.noaa_scale }}</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">{{ alert.noaa_scale }}</span>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="badge bg-secondary">НЕТ</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if alert.potential_impacts %}
+                                                <small>{{ alert.potential_impacts|truncatewords:8 }}</small>
+                                            {% else %}
+                                                <small class="text-muted">НЕТ</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <small>{{ alert.issue_time|date:"d.m.Y H:i" }} UTC</small>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'alert_detail' alert.id %}" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fas fa-info-circle"></i> Подробнее
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Пагинация -->
+                        {% if noaa_data.db_alerts.has_other_pages %}
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <div>
+                                <span class="text-muted">
+                                    Показано {{ noaa_data.db_alerts.start_index }}-{{ noaa_data.db_alerts.end_index }} 
+                                    из {{ noaa_data.db_alerts.paginator.count }} алертов
+                                </span>
+                            </div>
+                            <nav>
+                                <ul class="pagination pagination-sm mb-0">
+                                    {% if noaa_data.db_alerts.has_previous %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page=1">&laquo;&laquo;</a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ noaa_data.db_alerts.previous_page_number }}">&laquo;</a>
+                                        </li>
+                                    {% endif %}
+                                    
+                                    {% for num in noaa_data.db_alerts.paginator.page_range %}
+                                        {% if noaa_data.db_alerts.number == num %}
+                                            <li class="page-item active">
+                                                <span class="page-link">{{ num }}</span>
+                                            </li>
+                                        {% elif num > noaa_data.db_alerts.number|add:'-3' and num < noaa_data.db_alerts.number|add:'3' %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                    
+                                    {% if noaa_data.db_alerts.has_next %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ noaa_data.db_alerts.next_page_number }}">&raquo;</a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ noaa_data.db_alerts.paginator.num_pages }}">&raquo;&raquo;</a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- Information Section -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4><i class="fas fa-info-circle"></i> Объяснение шкал NOAA</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h5 class="text-primary">R - Радиоблэкауты</h5>
+                            <p><small>Нарушения радиосвязи из-за солнечных вспышек.</small></p>
+                            <ul class="small">
+                                <li><strong>R1-R2 (Слабые-Умеренные):</strong> Локальные сбои связи</li>
+                                <li><strong>R3-R5 (Сильные-Экстремальные):</strong> Массовые отключения</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4">
+                            <h5 class="text-warning">S - Солнечные бури</h5>
+                            <p><small>Потоки частиц, влияющие на спутники и авиацию.</small></p>
+                            <ul class="small">
+                                <li><strong>S1 (Слабые):</strong> Незначительное влияние на спутники</li>
+                                <li><strong>S2-S5:</strong> Опасность для космонавтов и техники</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4">
+                            <h5 class="text-danger">G - Геомагнитные бури</h5>
+                            <p><small>Возмущения магнитного поля Земли.</small></p>
+                            <ul class="small">
+                                <li><strong>G1 (Слабые):</strong> Небольшие сбои энергосетей</li>
+                                <li><strong>G2-G5:</strong> Серьезные технологические нарушения</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% endif %}
+
+    <!-- Navigation -->
+    <div class="row mt-4">
+        <div class="col-12 text-center mb-5">
+            <a href="{% url 'home' %}" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-home"></i> Главная
+            </a>
+            <a href="{% url 'settings' %}" class="btn btn-secondary">
+                <i class="fas fa-cog"></i> Настройки
+            </a>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block extra_js %}
+{% load static %}
+<script src="{% static 'js/table-sort.js' %}"></script>
+{% endblock %}

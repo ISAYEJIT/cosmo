@@ -1,0 +1,359 @@
+/* Components CSS - Common components for the entire project */
+
+/* Tables */
+.table {
+    color: var(--text-primary);
+    background-color: transparent;
+}
+
+.table th {
+    border-top: none;
+    border-bottom: 2px solid var(--accent-border);
+    color: var(--accent-color);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.table td {
+    border-top: 1px solid var(--glass-effect);
+    vertical-align: middle;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.table-hover tbody tr:hover {
+    background-color: var(--accent-light);
+    transition: all 0.3s ease;
+}
+
+.table-dark {
+    background-color: var(--card-gradient);
+}
+
+.table-dark th {
+    color: var(--accent-color);
+    background-color: var(--secondary-bg);
+    border-color: var(--accent-border);
+}
+
+.table-warning {
+    background-color: rgba(255, 193, 7, 0.1);
+}
+
+.table-light {
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+/* Responsive Tables */
+.table-responsive {
+    border-radius: 10px;
+    background: rgba(26, 26, 46, 0.5);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--accent-border);
+}
+
+/* Badges */
+.badge {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge.bg-primary {
+    background: var(--btn-bg) !important;
+    box-shadow: 0 2px 8px var(--glow-accent);
+}
+
+.badge.bg-success {
+    background: linear-gradient(45deg, #28a745, #20c997) !important;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+}
+
+.badge.bg-warning {
+    background: linear-gradient(45deg, #ffc107, #fd7e14) !important;
+    color: #000 !important;
+    box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+}
+
+.badge.bg-danger {
+    background: linear-gradient(45deg, #dc3545, #e83e8c) !important;
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+}
+
+.badge.bg-info {
+    background: var(--accent-color) !important;
+    box-shadow: 0 2px 8px var(--glow-accent);
+}
+
+.badge.bg-secondary {
+    background: var(--card-bg) !important;
+    box-shadow: 0 2px 8px var(--shadow-medium);
+}
+
+/* Button variations */
+.btn-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+    border-radius: 20px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-outline-secondary {
+    border: 2px solid var(--btn-inverse-border);
+    color: var(--btn-inverse-text);
+    background: var(--btn-inverse-bg);
+    border-radius: 25px;
+    padding: 0.4rem 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.btn-outline-secondary:hover {
+    background: var(--btn-bg);
+    border-color: var(--btn-bg);
+    color: var(--btn-text);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px var(--glow-accent);
+}
+
+.btn-secondary {
+    background: var(--btn-inverse-bg);
+    border: 2px solid var(--btn-inverse-border);
+    color: var(--btn-inverse-text);
+    border-radius: 25px;
+    padding: 12px 30px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px var(--shadow-medium);
+}
+
+.btn-secondary:hover {
+    background: var(--btn-bg);
+    border-color: var(--btn-bg);
+    color: var(--btn-text);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px var(--glow-accent);
+}
+
+/* Alerts */
+.alert {
+    border: none;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    border-left: 4px solid;
+}
+
+.alert-info {
+    background: var(--accent-light);
+    border-left-color: var(--accent-color);
+    color: var(--text-primary);
+}
+
+.alert-warning {
+    background: rgba(255, 193, 7, 0.1);
+    border-left-color: var(--warning-color);
+    color: var(--text-primary);
+}
+
+.alert-primary {
+    background: var(--accent-light);
+    border-left-color: var(--accent-color);
+    color: var(--text-primary);
+}
+
+.alert-secondary {
+    background: rgba(44, 44, 84, 0.1);
+    border-left-color: var(--card-bg);
+    color: var(--text-primary);
+}
+
+/* Breadcrumbs */
+.breadcrumb {
+    background: var(--card-gradient);
+    border-radius: 10px;
+    padding: 1rem 1.5rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--accent-border);
+}
+
+.breadcrumb-item a {
+    color: var(--accent-color);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.breadcrumb-item a:hover {
+    color: var(--accent-hover);
+    text-shadow: 0 0 5px var(--glow-accent);
+}
+
+.breadcrumb-item.active {
+    color: var(--text-secondary);
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    color: var(--text-secondary);
+    content: ">";
+}
+
+/* Card enhancements */
+.card-header {
+    background: var(--secondary-bg);
+    border-bottom: 1px solid var(--accent-border);
+    color: var(--text-primary);
+}
+
+.card-header h3,
+.card-header h4,
+.card-header h5 {
+    color: var(--accent-color);
+    margin-bottom: 0;
+}
+
+/* Text colors */
+.text-primary {
+    color: var(--accent-color) !important;
+}
+
+.text-muted {
+    color: var(--text-secondary) !important;
+}
+
+.text-success {
+    color: #28a745 !important;
+}
+
+.text-warning {
+    color: #ffc107 !important;
+}
+
+.text-danger {
+    color: #dc3545 !important;
+}
+
+.text-info {
+    color: var(--accent-color) !important;
+}
+
+/* Small text adjustments */
+small, .small {
+    color: var(--text-secondary);
+}
+
+/* List styling */
+ul {
+    color: var(--text-primary);
+}
+
+li {
+    margin-bottom: 0.25rem;
+}
+
+/* Pre and code blocks */
+pre {
+    background: var(--secondary-bg) !important;
+    border: 1px solid var(--accent-border);
+    color: var(--text-primary);
+    border-radius: 8px;
+}
+
+/* Icon colors */
+.fas, .far {
+    color: var(--accent-color);
+}
+
+.text-success .fas,
+.text-success .far {
+    color: #28a745;
+}
+
+.text-warning .fas,
+.text-warning .far {
+    color: #ffc107;
+}
+
+.text-danger .fas,
+.text-danger .far {
+    color: #dc3545;
+}
+
+.text-info .fas,
+.text-info .far {
+    color: var(--accent-color);
+}
+
+/* Белые иконки в primary кнопках - переопределение цветных иконок */
+.btn-primary i,
+.btn-primary .fas,
+.btn-primary .far,
+.btn-primary .fab {
+    color: #ffffff !important;
+    text-shadow: none !important;
+}
+
+/* Белые иконки в успешных действиях */
+.btn-success i,
+.btn-success .fas,
+.btn-success .far {
+    color: #ffffff !important;
+}
+
+/* Иконки в outline кнопках следуют цвету текста */
+.btn-outline-primary i,
+.btn-outline-secondary i {
+    color: inherit;
+}
+
+/* Цветовые уровни для прогнозов космической погоды */
+.level-0 {
+    background: linear-gradient(135deg, rgba(40, 167, 69, 0.2), rgba(32, 201, 151, 0.2));
+    border: 1px solid rgba(40, 167, 69, 0.3);
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.2);
+}
+
+.level-yellow {
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.2), rgba(253, 126, 20, 0.2));
+    border: 1px solid rgba(255, 193, 7, 0.4);
+    box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+    animation: pulse-yellow 2s infinite;
+}
+
+.level-red {
+    background: linear-gradient(135deg, rgba(220, 53, 69, 0.2), rgba(232, 62, 140, 0.2));
+    border: 1px solid rgba(220, 53, 69, 0.4);
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+    animation: pulse-red 2s infinite;
+}
+
+/* Анимации для предупреждающих цветов */
+@keyframes pulse-yellow {
+    0%, 100% {
+        box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+    }
+    50% {
+        box-shadow: 0 4px 16px rgba(255, 193, 7, 0.5);
+    }
+}
+
+@keyframes pulse-red {
+    0%, 100% {
+        box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+    }
+    50% {
+        box-shadow: 0 4px 16px rgba(220, 53, 69, 0.5);
+    }
+}
+

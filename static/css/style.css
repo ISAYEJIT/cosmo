@@ -1,0 +1,429 @@
+
+:root {
+    /* Основная цветовая палитра */
+    --primary-bg: #0a0a0f;
+    --secondary-bg: #1a1a2e;
+    --card-bg: #2c2c54;
+    
+    /* Единый акцентный цвет */
+    --accent-color: #00d4ff;
+    --accent-hover: #0099cc;
+    --accent-light: rgba(0, 212, 255, 0.1);
+    --accent-border: rgba(0, 212, 255, 0.3);
+    
+    /* Текст */
+    --text-primary: #ffffff;
+    --text-secondary: #b8b8d1;
+    --text-muted: #8a8aa8;
+    
+    /* Единая кнопка */
+    --btn-bg: var(--accent-color);
+    --btn-hover: var(--accent-hover);
+    --btn-text: var(--text-primary);
+    --btn-inverse-bg: transparent;
+    --btn-inverse-border: var(--accent-color);
+    --btn-inverse-text: var(--accent-color);
+    
+    /* Состояния */
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --info-color: var(--accent-color);
+    
+    /* Эффекты */
+    --shadow-light: rgba(0, 0, 0, 0.1);
+    --shadow-medium: rgba(0, 0, 0, 0.3);
+    --shadow-heavy: rgba(0, 0, 0, 0.4);
+    --glow-accent: rgba(0, 212, 255, 0.3);
+    
+    /* Фон и градиенты */
+    --bg-gradient: linear-gradient(135deg, var(--primary-bg) 0%, var(--secondary-bg) 25%, #16213e 50%, #533483 100%);
+    --card-gradient: rgba(44, 44, 84, 0.8);
+    --glass-effect: rgba(255, 255, 255, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--bg-gradient);
+    background-attachment: fixed;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-primary);
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Анимированные звезды на фоне */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(2px 2px at 20px 30px, var(--accent-color), transparent),
+        radial-gradient(2px 2px at 40px 70px, var(--accent-color), transparent),
+        radial-gradient(1px 1px at 90px 40px, var(--text-primary), transparent),
+        radial-gradient(1px 1px at 130px 80px, var(--accent-color), transparent),
+        radial-gradient(2px 2px at 160px 30px, var(--accent-color), transparent);
+    background-repeat: repeat;
+    background-size: 200px 100px;
+    animation: twinkle 4s ease-in-out infinite alternate;
+    pointer-events: none;
+    z-index: -1;
+}
+
+@keyframes twinkle {
+    0% { opacity: 0.3; }
+    100% { opacity: 0.8; }
+}
+
+/* Навигация */
+.navbar {
+    background: rgba(10, 10, 15, 0.8);
+    backdrop-filter: blur(15px);
+    border-bottom: 1px solid var(--accent-border);
+    box-shadow: 0 4px 20px var(--shadow-medium);
+}
+
+.navbar-brand {
+    font-weight: bold;
+    color: var(--accent-color) !important;
+    text-shadow: 0 0 10px var(--glow-accent);
+    font-size: 1.5rem;
+}
+
+.nav-link {
+    color: var(--text-secondary) !important;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.nav-link:hover {
+    color: var(--accent-color) !important;
+    text-shadow: 0 0 8px var(--glow-accent);
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -5px;
+    left: 50%;
+    background: var(--accent-color);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+/* Основной контент */
+.main-content {
+    background: var(--card-gradient);
+    border-radius: 20px;
+    box-shadow: 
+        0 20px 40px var(--shadow-heavy),
+        inset 0 1px 0 var(--glass-effect);
+    margin: 2rem 0;
+    padding: 2rem;
+    border: 1px solid var(--accent-border);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.main-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+}
+
+/* Карточки */
+.card {
+    background: var(--card-gradient);
+    border: 1px solid var(--accent-border);
+    border-radius: 15px;
+    box-shadow: 
+        0 10px 30px var(--shadow-medium),
+        inset 0 1px 0 var(--glass-effect);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 
+        0 20px 40px var(--shadow-heavy),
+        0 0 20px var(--glow-accent);
+    border-color: var(--accent-color);
+}
+
+.card-body {
+    color: var(--text-primary);
+}
+
+.card-title {
+    color: var(--accent-color);
+    text-shadow: 0 0 10px var(--glow-accent);
+}
+
+/* Кнопки - единый стиль */
+.btn-primary {
+    background: var(--btn-bg);
+    border: 2px solid var(--btn-bg);
+    border-radius: 25px;
+    padding: 12px 30px;
+    transition: all 0.3s ease;
+    color: var(--btn-text);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 15px var(--glow-accent);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px var(--glow-accent);
+    background: var(--btn-hover);
+    border-color: var(--btn-hover);
+    color: var(--btn-text);
+}
+
+/* Кнопка с инверсией */
+.btn-light, .btn-outline, .btn-secondary {
+    background: var(--btn-inverse-bg);
+    border: 2px solid var(--btn-inverse-border);
+    color: var(--btn-inverse-text);
+    border-radius: 25px;
+    padding: 12px 30px;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    backdrop-filter: blur(10px);
+}
+
+.btn-light:hover, .btn-outline:hover, .btn-secondary:hover {
+    background: var(--btn-bg);
+    border-color: var(--btn-bg);
+    color: var(--btn-text);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px var(--glow-accent);
+}
+
+/* Формы */
+.form-control {
+    background: var(--card-gradient);
+    border: 1px solid var(--accent-border);
+    color: var(--text-primary);
+    border-radius: 10px;
+    backdrop-filter: blur(5px);
+}
+
+.form-control:focus {
+    background: var(--card-bg);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 15px var(--glow-accent);
+    color: var(--text-primary);
+}
+
+.form-control::placeholder {
+    color: var(--text-muted);
+}
+
+/* Заголовки */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-primary);
+    text-shadow: 0 0 10px var(--glow-accent);
+}
+
+.display-4 {
+    background: linear-gradient(45deg, var(--accent-color), var(--accent-hover));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+}
+
+/* Иконки */
+.fa-cloud-sun, .fa-search-location, .fa-star, .fa-rocket,
+.fa-thermometer-half, .fa-map-marker-alt, .fa-mobile-alt {
+    color: var(--accent-color);
+    text-shadow: 0 0 10px var(--glow-accent);
+}
+
+/* Футер */
+.footer {
+    background: rgba(10, 10, 15, 0.9);
+    color: var(--text-secondary);
+    text-align: center;
+    padding: 2rem 0;
+    margin-top: auto;
+    border-top: 1px solid var(--accent-border);
+    backdrop-filter: blur(10px);
+}
+
+/* Анимации */
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+.card:hover .fa-3x {
+    animation: float 2s ease-in-out infinite;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .main-content {
+        margin: 1rem 0;
+        padding: 1.5rem;
+    }
+    
+    .display-4 {
+        font-size: 2rem;
+    }
+    
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+}
+
+/* Дополнительные эффекты */
+.space-glow {
+    box-shadow: 0 0 20px var(--glow-accent);
+}
+
+.cosmic-border {
+    border: 2px solid transparent;
+    background: linear-gradient(45deg, var(--primary-bg), var(--secondary-bg)) padding-box,
+                linear-gradient(45deg, var(--accent-color), var(--accent-hover)) border-box;
+}
+
+/* Пульсирующий эффект для важных элементов */
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 var(--glow-accent); }
+    70% { box-shadow: 0 0 0 10px rgba(0, 212, 255, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 212, 255, 0); }
+}
+
+/* Специальные стили для главной страницы */
+.main-feature-card {
+    background: linear-gradient(135deg, rgba(10, 10, 15, 0.95), rgba(26, 26, 46, 0.95));
+    border: 2px solid var(--accent-color);
+    box-shadow: 
+        0 15px 35px var(--shadow-heavy),
+        0 0 25px var(--glow-accent),
+        inset 0 1px 0 var(--glass-effect);
+    backdrop-filter: blur(15px);
+    min-height: 250px;
+}
+
+.main-feature-card:hover {
+    transform: translateY(-8px) scale(1.01);
+    box-shadow: 
+        0 20px 45px var(--shadow-heavy),
+        0 0 35px var(--glow-accent),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    border-color: rgba(0, 212, 255, 0.8);
+}
+
+.main-feature-card .card-header {
+    background: var(--card-bg);
+    color: var(--text-primary);
+    font-weight: 700;
+    text-shadow: 0 0 5px var(--glow-accent);
+    border-bottom: 1px solid var(--accent-border);
+    border: 2px solid var(--accent-color);
+    border-bottom: 1px solid var(--accent-color);
+}
+
+.main-feature-card .card-body {
+    padding: 2.5rem;
+}
+
+.main-feature-card .lead {
+    font-size: 1.3rem;
+    color: var(--text-primary);
+    margin-bottom: 2rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.info-card {
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.9), rgba(44, 44, 84, 0.9));
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.info-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.info-block {
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.info-block:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-3px);
+}
+
+.info-block h5 {
+    color: var(--accent-color);
+    font-weight: 600;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.info-block p {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 0;
+}
+
+.display-3 {
+    font-weight: 300;
+}
+
+/* Белые иконки в синих кнопках */
+.btn-primary i,
+.btn-primary .fas,
+.btn-primary .far {
+    color: #ffffff !important;
+}
+
+/* Убираем цветные иконки из primary кнопок */
+.btn-primary .fa-satellite,
+.btn-primary .fa-home,
+.btn-primary .fa-info-circle,
+.btn-primary .fa-eye,
+.btn-primary .fa-cog {
+    color: #ffffff !important;
+    text-shadow: none !important;
+}

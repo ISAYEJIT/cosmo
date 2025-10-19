@@ -1,0 +1,312 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{{ page_title }} - Zarya{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Навигационные крошки -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
+            {% for crumb in breadcrumbs %}
+                {% if crumb.url %}
+                    <li class="breadcrumb-item"><a href="{% url crumb.url %}">{{ crumb.title }}</a></li>
+                {% else %}
+                    <li class="breadcrumb-item active" aria-current="page">{{ crumb.title }}</li>
+                {% endif %}
+            {% endfor %}
+        </ol>
+    </nav>
+
+    <!-- Заголовок -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h2">
+                    🛰️ Событие {{ alert.message_code }}-{{ alert.serial_number }}
+                    {% if alert_type %}
+                        <small class="text-muted">({{ alert_type }})</small>
+                    {% endif %}
+                </h1>
+                <a href="{% url 'noaa_detailed' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Назад к списку
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Основная информация -->
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        {{ alert.warning_type }}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Статус -->
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-muted">Статус события</h6>
+                            {% if alert.is_active %}
+                                <span class="badge bg-danger fs-6">🔴 Активное</span>
+                            {% else %}
+                                <span class="badge bg-secondary fs-6">⚫ Завершено</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Шкала NOAA -->
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-muted">Шкала NOAA</h6>
+                            {% if alert.severity_level >= 4 %}
+                                <span class="badge bg-danger fs-6">{{ alert.noaa_scale|default:"Не указана" }}</span>
+                            {% elif alert.severity_level >= 3 %}
+                                <span class="badge bg-warning fs-6">{{ alert.noaa_scale|default:"Не указана" }}</span>
+                            {% elif alert.severity_level >= 2 %}
+                                <span class="badge bg-info fs-6">{{ alert.noaa_scale|default:"Не указана" }}</span>
+                            {% else %}
+                                <span class="badge bg-success fs-6">{{ alert.noaa_scale|default:"Не указана" }}</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Условие предупреждения -->
+                        {% if alert.warning_condition %}
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-muted">Условие предупреждения</h6>
+                            <span class="badge bg-info">{{ alert.warning_condition }}</span>
+                        </div>
+                        {% endif %}
+
+                        <!-- Скорость (если есть) -->
+                        {% if alert.estimated_velocity %}
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-muted">Оценочная скорость</h6>
+                            <span class="fs-5 fw-bold text-primary">{{ alert.estimated_velocity }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Описание события -->
+                    {% if alert.description %}
+                    <div class="mt-4">
+                        <h6 class="text-muted">Описание события</h6>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            {{ alert.description }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Максимальный поток (для E-типов) -->
+                    {% if alert.maximum_flux %}
+                    <div class="mt-4">
+                        <h6 class="text-muted">Максимальный поток электронов</h6>
+                        <div class="alert alert-primary">
+                            <i class="fas fa-bolt me-2"></i>
+                            {{ alert.maximum_flux }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Данные прогноза (для A-типов) -->
+                    {% if alert.forecast_data %}
+                    <div class="mt-4">
+                        <h6 class="text-muted">Данные прогноза</h6>
+                        <div class="alert alert-secondary">
+                            <i class="fas fa-chart-line me-2"></i>
+                            <pre class="mb-0" style="white-space: pre-wrap;">{{ alert.forecast_data }}</pre>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Потенциальные воздействия -->
+                    {% if alert.potential_impacts %}
+                    <div class="mt-4">
+                        <h6 class="text-muted">Потенциальные воздействия</h6>
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            {{ alert.potential_impacts }}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Боковая панель с временными данными -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-clock"></i> Временная линия
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Время выпуска -->
+                    <div class="timeline-item mb-3">
+                        <h6 class="mb-1">
+                            <i class="fas fa-broadcast-tower text-primary"></i> 
+                            Время выпуска
+                        </h6>
+                        <p class="mb-0 text-muted">{{ alert.issue_time|date:"d.m.Y H:i" }} UTC</p>
+                    </div>
+
+                    <!-- Время начала -->
+                    {% if alert.begin_time %}
+                    <div class="timeline-item mb-3">
+                        <h6 class="mb-1">
+                            <i class="fas fa-play text-success"></i> 
+                            Время начала
+                        </h6>
+                        <p class="mb-0 text-muted">{{ alert.begin_time|date:"d.m.Y H:i" }} UTC</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Время максимума -->
+                    {% if alert.maximum_time %}
+                    <div class="timeline-item mb-3">
+                        <h6 class="mb-1">
+                            <i class="fas fa-arrow-up text-warning"></i> 
+                            Время максимума
+                        </h6>
+                        <p class="mb-0 text-muted">{{ alert.maximum_time|date:"d.m.Y H:i" }} UTC</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Время окончания -->
+                    {% if alert.end_time %}
+                    <div class="timeline-item mb-3">
+                        <h6 class="mb-1">
+                            <i class="fas fa-stop text-danger"></i> 
+                            Время окончания
+                        </h6>
+                        <p class="mb-0 text-muted">{{ alert.end_time|date:"d.m.Y H:i" }} UTC</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Действительно с -->
+                    {% if alert.valid_from %}
+                    <div class="timeline-item mb-3">
+                        <h6 class="mb-1">
+                            <i class="fas fa-calendar-check text-info"></i> 
+                            Действительно с
+                        </h6>
+                        <p class="mb-0 text-muted">{{ alert.valid_from|date:"d.m.Y H:i" }} UTC</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Действительно до -->
+                    {% if alert.valid_to %}
+                    <div class="timeline-item mb-3">
+                        <h6 class="mb-1">
+                            <i class="fas fa-calendar-times text-danger"></i> 
+                            Действительно до
+                        </h6>
+                        <p class="mb-0 text-muted">{{ alert.valid_to|date:"d.m.Y H:i" }} UTC</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Время создания записи -->
+                    <div class="timeline-item">
+                        <h6 class="mb-1">
+                            <i class="fas fa-database text-secondary"></i> 
+                            Добавлено в систему
+                        </h6>
+                        <p class="mb-0 text-muted">{{ alert.created_at|date:"d.m.Y H:i" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Полное сообщение -->
+    <!-- Комментарии -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-comments"></i> Комментарии ({{ comments.count }})
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Форма добавления комментария -->
+                    <form method="post" action="{% url 'add_comment' alert.id %}" class="mb-4">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="author_name" class="form-label">Имя</label>
+                            <input type="text" class="form-control" id="author_name" name="author_name" required maxlength="100">
+                        </div>
+                        <div class="mb-3">
+                            <label for="content" class="form-label">Комментарий</label>
+                            <textarea class="form-control" id="content" name="content" rows="3" required maxlength="1000" placeholder="Оставьте ваш комментарий..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Добавить комментарий
+                        </button>
+                    </form>
+
+                    <!-- Список комментариев -->
+                    {% if comments %}
+                        <div class="comments-list">
+                            {% for comment in comments %}
+                            <div class="comment-item border-bottom pb-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <strong>{{ comment.author_name }}</strong>
+                                        <small class="text-muted ms-2">{{ comment.created_at|date:"d.m.Y H:i" }}</small>
+                                    </div>
+                                    <form method="post" action="{% url 'delete_comment' comment.id %}" class="d-inline" 
+                                          onsubmit="return confirm('Удалить этот комментарий?')">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                                <p class="mb-0 mt-2">{{ comment.content|linebreaks }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-comment-slash fa-2x mb-2"></i>
+                            <p>Пока нет комментариев. Будьте первым!</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline-item {
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.5rem;
+    width: 0.5rem;
+    height: 0.5rem;
+    background-color: #6c757d;
+    border-radius: 50%;
+}
+
+.timeline-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 0.125rem;
+    top: 1rem;
+    width: 0.25rem;
+    height: calc(100% - 0.5rem);
+    background-color: #dee2e6;
+}
+</style>
+{% endblock %}

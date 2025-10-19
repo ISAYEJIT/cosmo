@@ -1,0 +1,255 @@
+/* NOAA Space Weather Conditions - Special Styles for NOAA Scale Boxes */
+
+/* Condition Boxes */
+
+.small{
+    color: white;
+}
+
+.condition-box {
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin: 0.5rem;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+
+.condition-box:hover {
+    transform: translateY(-3px);
+}
+
+.condition-label {
+    font-size: 2rem;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 0.5rem;
+}
+
+.condition-value {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: white;
+}
+
+/* Color themes for condition boxes */
+.level-0 {
+    background: linear-gradient(135deg, #28a745, #20c997);
+}
+
+.level-1 {
+    background: linear-gradient(135deg, #ffc107, #fd7e14);
+}
+
+.level-2-plus {
+    background: linear-gradient(135deg, #dc3545, #e83e8c);
+}
+
+/* Новые стили для цветовой индикации прогнозов */
+.level-yellow {
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.8), rgba(253, 126, 20, 0.8)) !important;
+    border: 2px solid rgba(255, 193, 7, 0.9) !important;
+    box-shadow: 0 4px 16px rgba(255, 193, 7, 0.4) !important;
+    animation: pulse-yellow 2s infinite !important;
+}
+
+.level-red {
+    background: linear-gradient(135deg, rgba(220, 53, 69, 0.8), rgba(232, 62, 140, 0.8)) !important;
+    border: 2px solid rgba(220, 53, 69, 0.9) !important;
+    box-shadow: 0 4px 16px rgba(220, 53, 69, 0.4) !important;
+    animation: pulse-red 2s infinite !important;
+}
+
+/* Анимации для предупреждающих цветов */
+@keyframes pulse-yellow {
+    0%, 100% {
+        box-shadow: 0 4px 16px rgba(255, 193, 7, 0.4);
+    }
+    50% {
+        box-shadow: 0 6px 24px rgba(255, 193, 7, 0.6);
+    }
+}
+
+@keyframes pulse-red {
+    0%, 100% {
+        box-shadow: 0 4px 16px rgba(220, 53, 69, 0.4);
+    }
+    50% {
+        box-shadow: 0 6px 24px rgba(220, 53, 69, 0.6);
+    }
+}
+
+.level-0-light {
+    background: linear-gradient(135deg, #c3e6cb, #d4edda);
+    color: #155724 !important;
+}
+
+.level-1-light {
+    background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+    color: #856404 !important;
+}
+
+.level-2-plus-light {
+    background: linear-gradient(135deg, #f5c6cb, #f8d7da);
+    color: #721c24 !important;
+}
+
+/* Forecast Cards */
+.forecast-card {
+    padding: 1.5rem;
+    border-radius: 10px;
+    height: 100%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+
+.forecast-card:hover {
+    transform: translateY(-3px);
+}
+
+.today-forecast {
+    background: linear-gradient(135deg, #28a745, #1e7e34);
+    color: white;
+}
+
+.tomorrow-forecast {
+    background: linear-gradient(135deg, #17a2b8, #117a8b);
+    color: white;
+}
+
+.future-forecast {
+    background: linear-gradient(135deg, #6f42c1, #5a32a3);
+    color: white;
+}
+
+.forecast-item {
+    margin: 1rem 0;
+    padding: 0.8rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    border-left: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Solar Wind Cards */
+.solar-wind-card {
+    background: var(--card-gradient);
+    border: 1px solid var(--accent-border);
+    border-radius: 15px;
+    padding: 2rem 1.5rem;
+    margin: 0.5rem;
+    color: var(--text-primary);
+    text-align: center;
+    box-shadow: 0 8px 25px var(--shadow-medium);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+}
+
+.solar-wind-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 35px var(--glow-accent);
+    border-color: var(--accent-color);
+}
+
+/* Единый стиль для всех карточек - убираем разноцветные градиенты */
+.density-card,
+.speed-card,
+.temperature-card,
+.time-card {
+    background: var(--card-gradient);
+    border: 1px solid var(--accent-border);
+}
+
+.solar-wind-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--accent-color);
+    text-shadow: 0 0 8px var(--glow-accent);
+}
+
+.solar-wind-label {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.solar-wind-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--text-primary);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Alert styling fixes */
+.alert-warning {
+    color: black !important;
+}
+
+.alert-warning h5 {
+    color: black !important;
+}
+
+.alert-warning p {
+    color: black !important;
+}
+
+.card-header.bg-light {
+    color: black !important;
+}
+
+.card-header.bg-light h5 {
+    color: black !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .condition-box {
+        margin: 0.25rem;
+        min-height: 100px;
+        padding: 1rem;
+    }
+    
+    .condition-label {
+        font-size: 1.5rem;
+    }
+    
+    .condition-value {
+        font-size: 1rem;
+    }
+    
+    .forecast-card {
+        margin-bottom: 1rem;
+    }
+    
+    .solar-wind-card {
+        margin: 0.5rem;
+        padding: 2rem 1.5rem;
+        min-height: 180px;
+        border-radius: 15px;
+    }
+    
+    .solar-wind-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .solar-wind-label {
+        font-size: 1rem;
+        margin-bottom: 0.6rem;
+    }
+    
+    .solar-wind-value {
+        font-size: 1.8rem;
+    }
+}

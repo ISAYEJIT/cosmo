@@ -1,0 +1,202 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Настройки - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-cog me-2"></i>Настройки приложения
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Настройки прокси -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-shield-alt me-2"></i>Настройки прокси
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-sm-12">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" 
+                                                   id="proxyEnabled" name="proxy_enabled" 
+                                                   {% if proxy_enabled %}checked{% endif %}>
+                                            <label class="form-check-label fw-bold" for="proxyEnabled">
+                                                Использовать прокси-сервер
+                                            </label>
+                                        </div>
+                                        <small class="text-muted">
+                                            Включите для подключения через SOCKS4 прокси
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <div class="proxy-status mb-3">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <strong>Статус прокси:</strong>
+                                            <span class="badge {% if proxy_enabled %}bg-success{% else %}bg-secondary{% endif %}">
+                                                {% if proxy_enabled %}Включен{% else %}Отключен{% endif %}
+                                            </span>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <strong>Доступно прокси:</strong>
+                                            <span class="badge bg-info">{{ proxy_count }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {% if proxy_list %}
+                                <div class="proxy-list">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="mb-0">Загруженные прокси-серверы:</h6>
+                                        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#proxyTable" aria-expanded="false" aria-controls="proxyTable">
+                                            <i class="fas fa-chevron-down me-1"></i>Показать/скрыть
+                                        </button>
+                                    </div>
+                                    <div class="collapse" id="proxyTable">
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Хост</th>
+                                                        <th>Порт</th>
+                                                        <th>Аутентификация</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for proxy in proxy_list %}
+                                                    <tr>
+                                                        <td>{{ proxy.host }}</td>
+                                                        <td>{{ proxy.port }}</td>
+                                                        <td>
+                                                            {% if proxy.username %}
+                                                                <span class="badge bg-success">Да</span>
+                                                            {% else %}
+                                                                <span class="badge bg-secondary">Нет</span>
+                                                            {% endif %}
+                                                        </td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>Прокси не найдены!</strong><br>
+                                    Добавьте SOCKS4 прокси в файл <code>proxy_list.txt</code> в формате:<br>
+                                    <code>host:port</code> или <code>host:port:username:password</code>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Админская панель -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-user-shield me-2"></i>Администрирование
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">Управление алертами NOAA</h6>
+                                        <small class="text-muted">
+                                            Загрузка и управление предупреждениями космической погоды
+                                        </small>
+                                    </div>
+                                    <a href="{% url 'admin_alerts' %}" class="btn btn-warning">
+                                        <i class="fas fa-cogs me-2"></i>Открыть админ-панель
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Кнопки управления -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Сохранить настройки
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="testConnection()">
+                                <i class="fas fa-network-wired me-2"></i>Тест соединения
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+function testConnection() {
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Тестирование...';
+    btn.disabled = true;
+    
+    fetch('/test-connection/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Соединение успешно установлено!\nВаш IP: ' + data.ip);
+        } else {
+            alert('Ошибка соединения: ' + data.error);
+        }
+    })
+    .catch(error => {
+        alert('Ошибка тестирования: ' + error);
+    })
+    .finally(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
+}
+
+// Обновление иконки collapse кнопки
+document.addEventListener('DOMContentLoaded', function() {
+    const collapseElement = document.getElementById('proxyTable');
+    const toggleButton = document.querySelector('[data-bs-target="#proxyTable"]');
+    
+    if (collapseElement && toggleButton) {
+        collapseElement.addEventListener('show.bs.collapse', function () {
+            toggleButton.querySelector('i').className = 'fas fa-chevron-up me-1';
+        });
+        
+        collapseElement.addEventListener('hide.bs.collapse', function () {
+            toggleButton.querySelector('i').className = 'fas fa-chevron-down me-1';
+        });
+    }
+});
+</script>
+{% endblock %}

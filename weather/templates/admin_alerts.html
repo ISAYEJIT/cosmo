@@ -1,0 +1,290 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Админ-панель: Управление алертами{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Заголовок -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h2">🔧 Админ-панель: Управление алертами</h1>
+                <a href="{% url 'settings' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Назад к настройкам
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Сообщения -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+
+
+    <!-- Действия -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">🚀 Быстрые действия</h5>
+                    <form method="post" class="d-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="logout_admin">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-sign-out-alt"></i> Выйти
+                        </button>
+                    </form>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <form method="post" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="load_alerts">
+                                <button type="submit" class="btn btn-success btn-lg me-3">
+                                    <i class="fas fa-download"></i> Загрузить алерты из NOAA API
+                                </button>
+                            </form>
+                            <small class="text-muted d-block mt-2">
+                                Загружает последние предупреждения с https://services.swpc.noaa.gov/products/alerts.json
+                            </small>
+                        </div>
+                        <div class="col-md-6">
+                            <button type="button" class="btn btn-danger btn-lg" data-bs-toggle="modal" data-bs-target="#clearDatabaseModal">
+                                <i class="fas fa-trash"></i> Очистить базу данных
+                            </button>
+                            <small class="text-muted d-block mt-2">
+                                ВНИМАНИЕ: Удаляет все алерты из базы данных безвозвратно!
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Таблица алертов -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">📋 Алерты в базе данных</h5>
+                    <span class="badge bg-secondary">Страница {{ alerts.number }} из {{ alerts.paginator.num_pages }}</span>
+                </div>
+                <div class="card-body">
+                    {% if alerts %}
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Код</th>
+                                        <th>Шкала NOAA</th>
+                                        <th>Время выпуска</th>
+                                        <th>Статус</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for alert in alerts %}
+                                    <tr class="{% if alert.is_active %}table-warning{% endif %}">
+                                        <td>{{ alert.id }}</td>
+                                        <td>
+                                            <span class="badge bg-primary">{{ alert.message_code }}-{{ alert.serial_number }}</span>
+                                        </td>
+                                        <td>
+                                            {% if alert.severity_level >= 4 %}
+                                                <span class="badge bg-danger">{{ alert.noaa_scale }}</span>
+                                            {% elif alert.severity_level >= 3 %}
+                                                <span class="badge bg-warning">{{ alert.noaa_scale }}</span>
+                                            {% elif alert.severity_level >= 2 %}
+                                                <span class="badge bg-info">{{ alert.noaa_scale }}</span>
+                                            {% else %}
+                                                <span class="badge bg-success">{{ alert.noaa_scale|default:"—" }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <small>{{ alert.issue_time|date:"d.m.Y H:i" }} UTC</small>
+                                            {% if alert.estimated_velocity %}
+                                                <br><small class="text-info">{{ alert.estimated_velocity }}</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if alert.is_active %}
+                                                <span class="badge bg-success">Активно</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Завершено</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="{% url 'alert_detail' alert.id %}" class="btn btn-outline-primary btn-sm">
+                                                    Подробнее
+                                                </a>
+                                                <form method="post" class="d-inline" 
+                                                      onsubmit="return confirm('Удалить этот алерт?')">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="action" value="delete_alert">
+                                                    <input type="hidden" name="alert_id" value="{{ alert.id }}">
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Пагинация -->
+                        {% if alerts.has_other_pages %}
+                        <nav aria-label="Навигация по страницам">
+                            <ul class="pagination justify-content-center">
+                                {% if alerts.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1">Первая</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ alerts.previous_page_number }}">Предыдущая</a>
+                                    </li>
+                                {% endif %}
+
+                                <li class="page-item active">
+                                    <span class="page-link">
+                                        Страница {{ alerts.number }} из {{ alerts.paginator.num_pages }}
+                                    </span>
+                                </li>
+
+                                {% if alerts.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ alerts.next_page_number }}">Следующая</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ alerts.paginator.num_pages }}">Последняя</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">Алертов в базе данных пока нет</h4>
+                            <p class="text-muted">Нажмите "Загрузить алерты из NOAA API" для начала работы</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для просмотра деталей алерта -->
+<div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="alertModalLabel">Детали алерта</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <h6>Полное сообщение:</h6>
+                <pre id="alertMessage" class="bg-light p-3 rounded" style="white-space: pre-wrap; font-size: 0.9em;"></pre>
+                
+                <h6>Потенциальные воздействия:</h6>
+                <p id="alertImpacts"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для очистки базы данных -->
+<div class="modal fade" id="clearDatabaseModal" tabindex="-1" aria-labelledby="clearDatabaseModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="clearDatabaseModalLabel">
+                    <i class="fas fa-exclamation-triangle"></i> КРИТИЧЕСКОЕ ДЕЙСТВИЕ
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger" role="alert">
+                    <h6 class="alert-heading">
+                        <i class="fas fa-skull-crossbones"></i> ВНИМАНИЕ!
+                    </h6>
+                    <p>Вы собираетесь <strong>безвозвратно удалить ВСЕ алерты</strong> из базы данных!</p>
+                    <hr>
+                    <p class="mb-0">Это действие <strong>НЕЛЬЗЯ отменить</strong>!</p>
+                </div>
+                
+                <form method="post" id="clearDatabaseForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="clear_alerts">
+                    
+                    <div class="mb-3">
+                        <label for="clear_password" class="form-label">
+                            <i class="fas fa-key"></i> Введите пароль для подтверждения:
+                        </label>
+                        <input type="password" 
+                               class="form-control" 
+                               id="clear_password" 
+                               name="clear_password" 
+                               placeholder="Введите пароль очистки"
+                               required
+                               autocomplete="off">
+                        <div class="form-text">
+                            <i class="fas fa-info-circle"></i> 
+                            Для очистки базы данных требуется специальный пароль
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Отмена
+                </button>
+                <button type="button" class="btn btn-danger" onclick="submitClearDatabase()">
+                    <i class="fas fa-trash"></i> Удалить все данные
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showAlertDetails(id, type, message, impacts) {
+    document.getElementById('alertMessage').textContent = message || 'Сообщение отсутствует';
+    document.getElementById('alertImpacts').textContent = impacts || 'Воздействия не указаны';
+}
+
+function submitClearDatabase() {
+    const password = document.getElementById('clear_password').value;
+    
+    if (!password) {
+        alert('❌ Введите пароль для подтверждения!');
+        return;
+    }
+    
+    // Дополнительное подтверждение
+    const finalConfirm = confirm('⚠️ ПОСЛЕДНЕЕ ПРЕДУПРЕЖДЕНИЕ!\n\nВы действительно хотите удалить ВСЕ данные из базы?\n\nЭто действие НЕЛЬЗЯ отменить!');
+    
+    if (finalConfirm) {
+        document.getElementById('clearDatabaseForm').submit();
+    }
+}
+
+</script>
+{% endblock %}
